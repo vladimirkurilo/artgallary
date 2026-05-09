@@ -30,6 +30,10 @@ export const artworkService = {
   delete: async (id: number) => {
     await api.delete(`artworks/${id}`);
   },
+  update: async (id: number, data: any) => {
+    const response = await api.put(`artworks/${id}`, data);
+    return response.data;
+  },
   purchase: async (id: number) => {
     const response = await api.post(`payments/checkout?artworkId=${id}`);
     return response.data; // This returns the checkout URL
@@ -47,6 +51,10 @@ export const exhibitionService = {
   },
   delete: async (id: number) => {
     await api.delete(`exhibitions/${id}`);
+  },
+  update: async (id: number, data: any) => {
+    const response = await api.put(`exhibitions/${id}`, data);
+    return response.data;
   }
 };
 
@@ -61,6 +69,10 @@ export const artistService = {
   },
   delete: async (id: number) => {
     await api.delete(`artists/${id}`);
+  },
+  update: async (id: number, data: any) => {
+    const response = await api.put(`artists/${id}`, data);
+    return response.data;
   }
 };
 

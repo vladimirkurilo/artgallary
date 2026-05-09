@@ -118,6 +118,17 @@ async function startServer() {
     res.status(204).send();
   });
 
+  app.put('/api/artworks/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const index = artworks.findIndex(a => a.id === id);
+    if (index !== -1) {
+      artworks[index] = { ...artworks[index], ...req.body, id };
+      res.json(artworks[index]);
+    } else {
+      res.status(404).json({ error: "Artwork not found" });
+    }
+  });
+
   // Artists
   app.get('/api/artists', (req, res) => {
     res.json(artists);
@@ -134,6 +145,17 @@ async function startServer() {
     res.status(204).send();
   });
 
+  app.put('/api/artists/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const index = artists.findIndex(a => a.id === id);
+    if (index !== -1) {
+      artists[index] = { ...artists[index], ...req.body, id };
+      res.json(artists[index]);
+    } else {
+      res.status(404).json({ error: "Artist not found" });
+    }
+  });
+
   // Exhibitions
   app.get('/api/exhibitions', (req, res) => {
     res.json(exhibitions);
@@ -148,6 +170,17 @@ async function startServer() {
   app.delete('/api/exhibitions/:id', (req, res) => {
     exhibitions = exhibitions.filter(e => e.id !== parseInt(req.params.id));
     res.status(204).send();
+  });
+
+  app.put('/api/exhibitions/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const index = exhibitions.findIndex(e => e.id === id);
+    if (index !== -1) {
+      exhibitions[index] = { ...exhibitions[index], ...req.body, id };
+      res.json(exhibitions[index]);
+    } else {
+      res.status(404).json({ error: "Exhibition not found" });
+    }
   });
 
   // Payments

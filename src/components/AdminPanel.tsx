@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { artworkService, exhibitionService, artistService } from '../lib/api';
 import { Artwork, Exhibition, Artist } from '../types';
-import { Trash2, Plus, X, ShieldAlert, Layout, Users, Calendar } from 'lucide-react';
+import { Trash2, Plus, X, ShieldAlert, Layout, Users, Calendar, Edit2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { formatCurrency } from '../lib/utils';
 import { useAuth } from './AuthProvider';
@@ -13,6 +13,7 @@ export const AdminPanel: React.FC = () => {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingItem, setEditingItem] = useState<any>(null);
   const { user, profile, loading: authLoading, isAdmin: checkAdmin } = useAuth();
   
   const [newArtwork, setNewArtwork] = useState({
@@ -92,37 +93,55 @@ export const AdminPanel: React.FC = () => {
   const handleAddArtwork = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const added = await artworkService.create({
-        ...newArtwork,
-        artistId: user?.email || 'admin',
-        status: 'AVAILABLE'
-      });
-      setItems([...items, added]);
+      if (editingItem) {
+        const updated = await artworkService.update(editingItem.id, newArtwork);
+        setItems(items.map(item => item.id === editingItem.id ? updated : item));
+      } else {
+        const added = await artworkService.create({
+          ...newArtwork,
+          artistId: user?.email || 'admin',
+          status: 'AVAILABLE'
+        });
+        setItems([...items, added]);
+      }
       setShowAddForm(false);
+      setEditingItem(null);
       setNewArtwork({ title: '', artistName: '', price: 0, imageUrl: '', description: '', royaltyRate: 10 });
     } catch (error) {
-      console.error("Error adding artwork:", error);
+      console.error("Error saving artwork:", error);
     }
   };
 
   const handleAddArtist = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const added = await artistService.create(newArtist);
-      setItems([...items, added]);
+      if (editingItem) {
+        const updated = await artistService.update(editingItem.id, newArtist);
+        setItems(items.map(item => item.id === editingItem.id ? updated : item));
+      } else {
+        const added = await artistService.create(newArtist);
+        setItems([...items, added]);
+      }
       setShowAddForm(false);
+      setEditingItem(null);
       setNewArtist({ name: '', bio: '', specialty: '', avatarUrl: '', location: '', artworkCount: 0 });
     } catch (error) {
-      console.error("Error adding artist:", error);
+      console.error("Error saving artist:", error);
     }
   };
 
   const handleAddExhibition = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const added = await exhibitionService.create(newExhibition);
-      setItems([...items, added]);
+      if (editingItem) {
+        const updated = await exhibitionService.update(editingItem.id, newExhibition);
+        setItems(items.map(item => item.id === editingItem.id ? updated : item));
+      } else {
+        const added = await exhibitionService.create(newExhibition);
+        setItems([...items, added]);
+      }
       setShowAddForm(false);
+      setEditingItem(null);
       setNewExhibition({
         title: '', description: '', imageUrl: '', videoUrl: '',
         startDate: new Date().toISOString().split('T')[0],
@@ -130,8 +149,43 @@ export const AdminPanel: React.FC = () => {
         location: '', status: 'UPCOMING'
       });
     } catch (error) {
-      console.error("Error adding exhibition:", error);
+      console.error("Error saving exhibition:", error);
     }
+  };
+
+  const handleEdit = (item: any) => {
+    setEditingItem(item);
+    if (activeTab === 'artworks') {
+      setNewArtwork({
+        title: item.title,
+        artistName: item.artistName,
+        price: item.price,
+        imageUrl: item.imageUrl,
+        description: item.description,
+        royaltyRate: item.royaltyRate || 10
+      });
+    } else if (activeTab === 'artists') {
+      setNewArtist({
+        name: item.name,
+        bio: item.bio,
+        specialty: item.specialty,
+        avatarUrl: item.avatarUrl,
+        location: item.location,
+        artworkCount: item.artworkCount || 0
+      });
+    } else if (activeTab === 'exhibitions') {
+      setNewExhibition({
+        title: item.title,
+        description: item.description,
+        imageUrl: item.imageUrl,
+        videoUrl: item.videoUrl || '',
+        startDate: item.startDate,
+        endDate: item.endDate,
+        location: item.location,
+        status: item.status
+      });
+    }
+    setShowAddForm(true);
   };
 
   if (authLoading) {
@@ -219,6 +273,12 @@ export const AdminPanel: React.FC = () => {
               </div>
               <div className="flex gap-4">
                 <button 
+                  onClick={() => handleEdit(item)}
+                  className="p-4 border border-border text-[#444] hover:text-accent hover:border-accent transition-all"
+                >
+                  <Edit2 size={20} />
+                </button>
+                <button 
                   onClick={() => handleDelete(item.id)}
                   className="p-4 border border-border text-[#444] hover:text-accent hover:border-accent transition-all"
                 >
@@ -244,14 +304,17 @@ export const AdminPanel: React.FC = () => {
               className="w-full max-w-2xl bg-[#0D0D0D] border border-border p-12 relative my-auto"
             >
               <button 
-                onClick={() => setShowAddForm(false)}
+                onClick={() => {
+                  setShowAddForm(false);
+                  setEditingItem(null);
+                }}
                 className="absolute top-8 right-8 text-[#666] hover:text-white transition-colors"
               >
                 <X size={24} />
               </button>
               
               <h2 className="text-3xl font-serif italic mb-8">
-                {activeTab === 'artworks' ? 'Новая работа' : activeTab === 'artists' ? 'Новый художник' : 'Новая выставка'}
+                {editingItem ? 'Редактирование' : (activeTab === 'artworks' ? 'Новая работа' : activeTab === 'artists' ? 'Новый художник' : 'Новая выставка')}
               </h2>
               
               {activeTab === 'artworks' && (
@@ -290,7 +353,9 @@ export const AdminPanel: React.FC = () => {
                     <textarea value={newArtwork.description} onChange={e => setNewArtwork({...newArtwork, description: e.target.value})}
                       className="w-full bg-[#111] border border-border p-4 h-32 focus:border-accent focus:outline-none transition-colors"></textarea>
                   </div>
-                  <button type="submit" className="w-full py-5 bg-accent text-white font-bold uppercase tracking-widest text-[10px] hover:scale-105 transition-all">Создать запись</button>
+                  <button type="submit" className="w-full py-5 bg-accent text-white font-bold uppercase tracking-widest text-[10px] hover:scale-105 transition-all">
+                    {editingItem ? 'Сохранить изменения' : 'Создать запись'}
+                  </button>
                 </form>
               )}
 
@@ -330,7 +395,9 @@ export const AdminPanel: React.FC = () => {
                     <textarea value={newArtist.bio} onChange={e => setNewArtist({...newArtist, bio: e.target.value})}
                       className="w-full bg-[#111] border border-border p-4 h-32 focus:border-accent focus:outline-none transition-colors"></textarea>
                   </div>
-                  <button type="submit" className="w-full py-5 bg-accent text-white font-bold uppercase tracking-widest text-[10px] hover:scale-105 transition-all">Создать профиль</button>
+                  <button type="submit" className="w-full py-5 bg-accent text-white font-bold uppercase tracking-widest text-[10px] hover:scale-105 transition-all">
+                    {editingItem ? 'Сохранить изменения' : 'Создать профиль'}
+                  </button>
                 </form>
               )}
 
@@ -386,7 +453,9 @@ export const AdminPanel: React.FC = () => {
                     <textarea value={newExhibition.description} onChange={e => setNewExhibition({...newExhibition, description: e.target.value})}
                       className="w-full bg-[#111] border border-border p-4 h-32 focus:border-accent focus:outline-none transition-colors"></textarea>
                   </div>
-                  <button type="submit" className="w-full py-5 bg-accent text-white font-bold uppercase tracking-widest text-[10px] hover:scale-105 transition-all">Открыть выставку</button>
+                  <button type="submit" className="w-full py-5 bg-accent text-white font-bold uppercase tracking-widest text-[10px] hover:scale-105 transition-all">
+                    {editingItem ? 'Сохранить изменения' : 'Открыть выставку'}
+                  </button>
                 </form>
               )}
             </motion.div>
