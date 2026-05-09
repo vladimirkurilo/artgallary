@@ -5,6 +5,7 @@ import { Trash2, Plus, X, ShieldAlert, Layout, Users, Calendar, Edit2 } from 'lu
 import { motion, AnimatePresence } from 'motion/react';
 import { formatCurrency } from '../lib/utils';
 import { useAuth } from './AuthProvider';
+import { FileUploader } from './FileUploader';
 
 type Tab = 'artworks' | 'artists' | 'exhibitions';
 
@@ -344,9 +345,16 @@ export const AdminPanel: React.FC = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">URL Изображения</label>
-                    <input required type="url" value={newArtwork.imageUrl} onChange={e => setNewArtwork({...newArtwork, imageUrl: e.target.value})}
-                      className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
+                    <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Изображение работы</label>
+                    <FileUploader 
+                      currentUrl={newArtwork.imageUrl} 
+                      onUploadSuccess={(url) => setNewArtwork({...newArtwork, imageUrl: url})} 
+                    />
+                    <div className="mt-2 flex gap-2">
+                      <input type="url" value={newArtwork.imageUrl} onChange={e => setNewArtwork({...newArtwork, imageUrl: e.target.value})}
+                        placeholder="Или вставьте прямую ссылку"
+                        className="flex-1 bg-[#111] border border-border p-3 text-[10px] focus:border-accent focus:outline-none transition-colors" />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Описание</label>
@@ -386,9 +394,16 @@ export const AdminPanel: React.FC = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">URL Аватара</label>
-                    <input required type="url" value={newArtist.avatarUrl} onChange={e => setNewArtist({...newArtist, avatarUrl: e.target.value})}
-                      className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
+                    <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Аватар художника</label>
+                    <FileUploader 
+                      currentUrl={newArtist.avatarUrl} 
+                      onUploadSuccess={(url) => setNewArtist({...newArtist, avatarUrl: url})} 
+                    />
+                    <div className="mt-2 flex gap-2">
+                      <input type="url" value={newArtist.avatarUrl} onChange={e => setNewArtist({...newArtist, avatarUrl: e.target.value})}
+                        placeholder="Или вставьте прямую ссылку"
+                        className="flex-1 bg-[#111] border border-border p-3 text-[10px] focus:border-accent focus:outline-none transition-colors" />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Биография</label>
@@ -438,14 +453,19 @@ export const AdminPanel: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">URL Обложки</label>
-                      <input required type="url" value={newExhibition.imageUrl} onChange={e => setNewExhibition({...newExhibition, imageUrl: e.target.value})}
-                        className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
+                      <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Обложка выставки</label>
+                      <FileUploader 
+                        currentUrl={newExhibition.imageUrl} 
+                        onUploadSuccess={(url) => setNewExhibition({...newExhibition, imageUrl: url})} 
+                      />
+                      <input type="url" value={newExhibition.imageUrl} onChange={e => setNewExhibition({...newExhibition, imageUrl: e.target.value})}
+                        placeholder="Ссылка на обложку"
+                        className="mt-2 w-full bg-[#111] border border-border p-3 text-[10px] focus:border-accent focus:outline-none transition-colors" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">URL Видео (опционально)</label>
                       <input type="url" value={newExhibition.videoUrl} onChange={e => setNewExhibition({...newExhibition, videoUrl: e.target.value})}
-                        className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
+                        className="w-full bg-[#111] border border-border p-4 h-[180px] focus:border-accent focus:outline-none transition-colors" />
                     </div>
                   </div>
                   <div className="space-y-2">

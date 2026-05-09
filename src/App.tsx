@@ -1,5 +1,6 @@
 import React from 'react';
 import { AuthProvider } from './components/AuthProvider';
+import { CartProvider } from './components/CartProvider';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { Features } from './components/Features';
@@ -11,6 +12,9 @@ import { UserDashboard } from './components/UserDashboard';
 import { Exhibitions } from './pages/Exhibitions';
 import { Artists } from './pages/Artists';
 import { Marketplace } from './pages/Marketplace';
+import { ArtistDetail } from './pages/ArtistDetail';
+import { ExhibitionDetail } from './pages/ExhibitionDetail';
+import { ArtworkDetailPage } from './pages/ArtworkDetail';
 import { motion, AnimatePresence } from 'motion/react';
 
 const ImmersiveTeaser = () => (
@@ -91,24 +95,29 @@ const LandingPage = () => (
 export default function App() {
   return (
     <AuthProvider>
-      <div className="min-h-screen">
-        <Navbar />
-        
-        <main>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/exhibitions" element={<Exhibitions />} />
-            <Route path="/artists" element={<Artists />} />
-            <Route path="/marketplace" element={<Marketplace />} />
-            <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/dashboard" element={<UserDashboard />} />
-            <Route path="/success" element={<div className="min-h-screen pt-60 text-center px-10"><h1 className="text-6xl font-serif italic mb-4">Успешно!</h1><p className="text-[#666]">Ваш транзакционный цикл завершен. Работа добавлена в коллекцию.</p></div>} />
-            <Route path="/cancel" element={<div className="min-h-screen pt-60 text-center px-10"><h1 className="text-6xl font-serif italic mb-4">Отмена</h1><p className="text-[#666]">Транзакция была прервана пользователем.</p></div>} />
-          </Routes>
-        </main>
+      <CartProvider>
+        <div className="min-h-screen">
+          <Navbar />
+          
+          <main>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/exhibitions" element={<Exhibitions />} />
+              <Route path="/exhibition/:id" element={<ExhibitionDetail />} />
+              <Route path="/artists" element={<Artists />} />
+              <Route path="/artist/:id" element={<ArtistDetail />} />
+              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/artwork/:id" element={<ArtworkDetailPage />} />
+              <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/dashboard" element={<UserDashboard />} />
+              <Route path="/success" element={<div className="min-h-screen pt-60 text-center px-10"><h1 className="text-6xl font-serif italic mb-4">Успешно!</h1><p className="text-[#666]">Ваш транзакционный цикл завершен. Работа добавлена в коллекцию.</p></div>} />
+              <Route path="/cancel" element={<div className="min-h-screen pt-60 text-center px-10"><h1 className="text-6xl font-serif italic mb-4">Отмена</h1><p className="text-[#666]">Транзакция была прервана пользователем.</p></div>} />
+            </Routes>
+          </main>
 
-        <Footer />
-      </div>
+          <Footer />
+        </div>
+      </CartProvider>
     </AuthProvider>
   );
 }

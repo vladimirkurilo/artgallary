@@ -12,15 +12,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { signIn } = useAuth();
+  const [role, setRole] = useState<'user' | 'artist'>('user');
+  const { signIn, signUp } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Pass actual credentials from form
-      await signIn({ email, password });
+      if (isLogin) {
+        await signIn({ email, password });
+      } else {
+        // use signUp if available, otherwise use signIn as mock
+        if (signUp) {
+          await signUp({ email, password, role });
+        } else {
+          await signIn({ email, password });
+        }
+      }
       onClose();
     } catch (error) {
       console.error(error);
@@ -57,6 +66,23 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               <h2 className="text-3xl font-serif italic mb-2">{isLogin ? 'Авторизация' : 'Регистрация'}</h2>
               <p className="text-[10px] uppercase tracking-[0.2em] text-[#666]">Протокол безопасности // V.4</p>
             </div>
+
+            {!isLogin && (
+              <div className="flex gap-2 mb-8 bg-[#111] p-1">
+                <button 
+                  onClick={() => setRole('user')}
+                  className={`flex-1 py-3 text-[9px] uppercase tracking-[0.2em] font-bold transition-all ${role === 'user' ? 'bg-accent text-white' : 'text-[#444] hover:text-white'}`}
+                >
+                  Коллекционер
+                </button>
+                <button 
+                  onClick={() => setRole('artist')}
+                  className={`flex-1 py-3 text-[9px] uppercase tracking-[0.2em] font-bold transition-all ${role === 'artist' ? 'bg-accent text-white' : 'text-[#444] hover:text-white'}`}
+                >
+                  Художник
+                </button>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">

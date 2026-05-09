@@ -45,6 +45,10 @@ export const exhibitionService = {
     const response = await api.get('exhibitions');
     return response.data;
   },
+  getById: async (id: number) => {
+    const response = await api.get(`exhibitions/${id}`);
+    return response.data;
+  },
   create: async (data: any) => {
     const response = await api.post('exhibitions', data);
     return response.data;
@@ -63,6 +67,10 @@ export const artistService = {
     const response = await api.get('artists');
     return response.data;
   },
+  getById: async (id: number) => {
+    const response = await api.get(`artists/${id}`);
+    return response.data;
+  },
   create: async (data: any) => {
     const response = await api.post('artists', data);
     return response.data;
@@ -72,6 +80,19 @@ export const artistService = {
   },
   update: async (id: number, data: any) => {
     const response = await api.put(`artists/${id}`, data);
+    return response.data;
+  }
+};
+
+export const uploadService = {
+  uploadFile: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post('upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
     return response.data;
   }
 };

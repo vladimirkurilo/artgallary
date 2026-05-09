@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
-import { LogOut, User } from 'lucide-react';
+import { LogOut, User, ShoppingBag } from 'lucide-react';
 import { useAuth } from './AuthProvider';
+import { useCart } from './CartProvider';
 import { motion } from 'motion/react';
 import { cn } from '../lib/utils';
 import { Link } from 'react-router-dom';
 import { AuthModal } from './AuthModal';
+import { Cart } from './Cart';
 
 export const Navbar: React.FC = () => {
   const { user, profile, logout: signOut, isAdmin: checkAdmin } = useAuth();
+  const { items } = useCart();
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const isAdmin = checkAdmin(user) || checkAdmin(profile);
 
@@ -46,6 +50,18 @@ export const Navbar: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-6 border-l border-border pl-12">
+            <button 
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-2 text-[#AAA] hover:text-white transition-colors"
+            >
+              <ShoppingBag size={20} />
+              {items.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent text-white text-[8px] flex items-center justify-center rounded-full font-bold">
+                  {items.length}
+                </span>
+              )}
+            </button>
+
             {user ? (
               <div className="flex items-center gap-4">
                 <Link to="/dashboard">
@@ -73,6 +89,7 @@ export const Navbar: React.FC = () => {
       </div>
 
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </nav>
   );
 };
