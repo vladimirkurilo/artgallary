@@ -26,6 +26,8 @@ public class Artwork {
     @Column(nullable = false)
     private BigDecimal price;
 
+    private Double royaltyRate;
+
     private String imageUrl;
 
     private String artistName;

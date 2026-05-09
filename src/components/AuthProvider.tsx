@@ -5,7 +5,7 @@ interface AuthContextType {
   user: any;
   profile: any;
   loading: boolean;
-  signIn: () => Promise<void>;
+  signIn: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => void;
   signOut: () => void;
 }
@@ -31,11 +31,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setLoading(false);
   }, []);
 
-  const signIn = async () => {
+  const signIn = async (credentials: { email: string; password: string }) => {
     try {
       setLoading(true);
-      // Для демо: вход под админом по умолчанию
-      const data = await authService.login({ email: 'Vovkin06@gmail.com', password: 'password' });
+      const data = await authService.login(credentials);
       setUser(data);
       setProfile(data);
       localStorage.setItem('token', data.token);

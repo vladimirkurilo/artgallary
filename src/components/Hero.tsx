@@ -32,13 +32,22 @@ export const Hero: React.FC = () => {
           >
             <div className="mb-10 max-w-2xl relative group">
               <div className="absolute -top-4 -left-4 w-24 h-24 border-t border-l border-accent opacity-50 group-hover:opacity-100 transition-opacity"></div>
-              <div className="bg-gradient-to-br from-[#1A1A1A] to-[#050505] p-1 border border-border">
+              <div className="bg-gradient-to-br from-[#1A1A1A] to-[#050505] p-1 border border-border relative overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1549490349-8643362247b5?auto=format&fit=crop&q=80&w=1200" 
-                  alt="Abstract Art" 
-                  className="w-full aspect-video object-cover"
-                  referrerPolicy="no-referrer"
+                  src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1200" 
+                  alt="Metamorphosis Preview" 
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
+                <video 
+                  src="https://player.vimeo.com/external/494270275.sd.mp4?s=d00ed50ef861c8567fdf8073b9ce967b57b78a00&profile_id=165"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  poster="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1200"
+                  className="relative z-10 w-full aspect-video object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700"
+                />
+                <div className="absolute inset-0 bg-onyx/20 pointer-events-none z-20" />
               </div>
               <div className="absolute bottom-6 right-6 flex items-center gap-4 bg-onyx/80 backdrop-blur-md px-6 py-2 border border-border">
                 <span className="text-xs font-serif italic">От 2.4 ETH</span>
@@ -71,8 +80,13 @@ export const Hero: React.FC = () => {
           <section className="mb-12">
             <h3 className="text-[10px] uppercase tracking-[0.3em] text-[#666] mb-6 font-bold">Художник месяца</h3>
             <div className="flex items-center gap-6">
-              <div className="w-16 h-16 bg-[#222] rounded-none rotate-45 border border-border flex items-center justify-center overflow-hidden">
-                <div className="-rotate-45 text-[10px] font-bold">ВА</div>
+              <div className="w-16 h-16 rounded-none rotate-45 border border-border flex items-center justify-center overflow-hidden">
+                <img 
+                  src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200" 
+                  alt="Valeria Ashwood" 
+                  className="w-full h-full object-cover -rotate-45 scale-125"
+                  referrerPolicy="no-referrer"
+                />
               </div>
               <div>
                 <p className="text-sm font-medium">Валерия Эшвуд</p>

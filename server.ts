@@ -29,13 +29,20 @@ async function startServer() {
   app.use('/api', createProxyMiddleware({
     target: BACKEND_URL,
     changeOrigin: true,
-    onError: (err, req, res) => {
-      console.error('Proxy error:', err);
-      // Fallback if backend is not yet started or failing
-      if (req.url === '/health') {
-        res.status(200).json({ status: 'waiting_for_backend' });
-      } else {
-        res.status(502).json({ error: 'Backend server not available' });
+    on: {
+      error: (err, req, res) => {
+        console.error('Proxy error:', err);
+        // Fallback if backend is not yet started or failing
+        if ('statusCode' in res) {
+          if (req.url === '/health') {
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ status: 'waiting_for_backend' }));
+          } else {
+            res.statusCode = 502;
+            res.end('Backend server not available');
+          }
+        }
       }
     }
   }));

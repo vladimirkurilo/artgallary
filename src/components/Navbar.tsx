@@ -38,7 +38,9 @@ export const Navbar: React.FC = () => {
           
         <div className="flex items-center gap-12">
           <div className="hidden lg:flex items-center gap-10 text-xs uppercase tracking-widest font-medium text-[#AAA]">
-            <Link to="/" className="hover:text-white transition-colors">Галерея</Link>
+            <Link to="/marketplace" className="hover:text-white transition-colors">Маркетплейс</Link>
+            <Link to="/exhibitions" className="hover:text-white transition-colors">Выставки</Link>
+            <Link to="/artists" className="hover:text-white transition-colors">Художники</Link>
             {isAdmin && <Link to="/admin" className="text-accent font-bold hover:text-white transition-colors">Админ</Link>}
             {user && <Link to="/dashboard" className="hover:text-white transition-colors">Кабинет</Link>}
           </div>

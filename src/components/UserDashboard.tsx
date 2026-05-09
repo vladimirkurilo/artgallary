@@ -50,7 +50,12 @@ export const UserDashboard: React.FC = () => {
         <div className="lg:col-span-1 space-y-8">
           <div className="p-8 border border-border bg-[#0D0D0D] text-center">
             <div className="w-24 h-24 rotate-45 border border-accent/30 mx-auto mb-8 bg-[#222] overflow-hidden flex items-center justify-center">
-               <User size={32} className="-rotate-45 text-[#444]" />
+               <img 
+                 src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200"
+                 alt="Profile"
+                 className="w-full h-full object-cover -rotate-45 scale-125"
+                 referrerPolicy="no-referrer"
+               />
             </div>
             <h2 className="text-2xl font-serif italic mb-1 leading-tight">{user.displayName || 'Коллекционер'}</h2>
             <p className="text-[10px] uppercase tracking-widest text-[#666] mb-8">{user.email}</p>

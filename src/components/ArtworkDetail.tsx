@@ -19,8 +19,8 @@ export const ArtworkDetail: React.FC<ArtworkDetailProps> = ({ artwork, onClose }
 
   const handlePurchase = async () => {
     if (!user) {
-      if (window.confirm("Для покупки необходимо авторизоваться. Войти в систему?")) {
-        signIn();
+      if (window.confirm("Для покупки необходимо авторизоваться под тестовым аккаунтом?")) {
+        signIn({ email: 'Vovkin06@gmail.com', password: 'password' });
       }
       return;
     }

@@ -36,6 +36,20 @@ export const artworkService = {
   }
 };
 
+export const exhibitionService = {
+  getAll: async () => {
+    const response = await api.get('/exhibitions');
+    return response.data;
+  }
+};
+
+export const artistService = {
+  getAll: async () => {
+    const response = await api.get('/artists');
+    return response.data;
+  }
+};
+
 export const authService = {
   login: async (credentials: any) => {
     const response = await api.post('/auth/login', credentials);

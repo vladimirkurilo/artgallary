@@ -19,8 +19,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // For demo we use the standard signIn that handles the API call
-      await signIn();
+      // Pass actual credentials from form
+      await signIn({ email, password });
       onClose();
     } catch (error) {
       console.error(error);

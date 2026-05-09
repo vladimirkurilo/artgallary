@@ -22,15 +22,25 @@ export interface Artwork {
 }
 
 export interface Exhibition {
-  id: string;
+  id: string | number;
   title: string;
   description: string;
-  curatorId: string;
-  coverImageUrl: string;
+  imageUrl: string;
+  videoUrl?: string;
   startDate: string;
   endDate: string;
-  isPublic: boolean;
-  layoutType: 'minimal' | 'immersive' | 'grid';
+  location: string;
+  status: 'UPCOMING' | 'ACTIVE' | 'FINISHED';
+}
+
+export interface Artist {
+  id: string | number;
+  name: string;
+  bio: string;
+  specialty: string;
+  avatarUrl: string;
+  location: string;
+  exhibitionCount: number;
 }
 
 export interface Review {

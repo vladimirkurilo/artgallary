@@ -8,6 +8,9 @@ import { Footer } from './components/Footer';
 import { Routes, Route } from 'react-router-dom';
 import { AdminPanel } from './components/AdminPanel';
 import { UserDashboard } from './components/UserDashboard';
+import { Exhibitions } from './pages/Exhibitions';
+import { Artists } from './pages/Artists';
+import { Marketplace } from './pages/Marketplace';
 import { motion, AnimatePresence } from 'motion/react';
 
 const ImmersiveTeaser = () => (
@@ -33,14 +36,14 @@ const ImmersiveTeaser = () => (
         initial={{ opacity: 0, scale: 0.9 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
-        className="relative aspect-square"
+        className="relative aspect-square group"
       >
         <div className="absolute inset-0 bg-accent/5 blur-3xl rounded-full" />
         <div className="absolute -top-4 -left-4 w-32 h-32 border-t border-l border-accent opacity-30"></div>
         <img 
-          src="https://images.unsplash.com/photo-1547891269-045ad91d039d?auto=format&fit=crop&q=80&w=1000" 
+          src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?auto=format&fit=crop&q=80&w=1000" 
           alt="Virtual Exhibition Preview" 
-          className="relative z-10 w-full h-full object-cover rounded-none grayscale transition-all duration-1000 border border-border"
+          className="relative z-10 w-full h-full object-cover rounded-none transition-all duration-1000 border border-border group-hover:scale-105"
           referrerPolicy="no-referrer"
         />
         <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#0D0D0D] border border-border flex flex-col items-center justify-center text-center p-4 z-20">
@@ -94,6 +97,9 @@ export default function App() {
         <main>
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/exhibitions" element={<Exhibitions />} />
+            <Route path="/artists" element={<Artists />} />
+            <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/dashboard" element={<UserDashboard />} />
             <Route path="/success" element={<div className="min-h-screen pt-60 text-center px-10"><h1 className="text-6xl font-serif italic mb-4">Успешно!</h1><p className="text-[#666]">Ваш транзакционный цикл завершен. Работа добавлена в коллекцию.</p></div>} />
