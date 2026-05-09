@@ -1,7 +1,8 @@
 FROM eclipse-temurin:21-jdk-jammy AS build
 WORKDIR /app
+RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
 COPY . .
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
