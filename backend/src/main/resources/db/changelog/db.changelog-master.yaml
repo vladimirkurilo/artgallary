@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: vovkin
+      changes:
+        - createTable:
+            tableName: artworks
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: title
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: price
+                  type: decimal(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: image_url
+                  type: varchar(255)
+              - column:
+                  name: artist_name
+                  type: varchar(255)
+              - column:
+                  name: artist_id
+                  type: varchar(255)
+              - column:
+                  name: status
+                  type: varchar(50)
+              - column:
+                  name: created_at
+                  type: timestamp

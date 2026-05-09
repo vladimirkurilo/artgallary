@@ -1,11 +1,48 @@
-<div align="center">
+# ArtSphere - Платформа Цифрового Искусства
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+Полнофункциональное приложение с Spring Boot бекендом и React фронтендом.
 
-  <h1>Built with AI Studio</h2>
+## Структура проекта
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+- `/backend` - Java Spring Boot приложение (Maven)
+- `/src` - React фронтенд (Vite)
+- `server.ts` - Node.js прокси-сервер, который объединяет фронт и бек в режиме разработки.
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Как запустить на вашем ПК
 
-</div>
+### Требования
+- Java 17+
+- Node.js 18+
+- Maven
+
+### Запуск через Docker (Рекомендуется)
+Если у вас установлен Docker и Docker Compose:
+```bash
+docker-compose up --build
+```
+Это запустит базу данных H2, Backend на 8080 и Frontend на 3000.
+
+### Ручной запуск
+1. **Запуск Backend**:
+   ```bash
+   cd backend
+   mvn spring-boot:run
+   ```
+2. **Запуск Frontend**:
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+## Возможности
+- **Галерея**: Просмотр работ (загружаются из БД или fallback).
+- **Покупка**: Имитация процесса оплаты и перенаправления.
+- **Админка**: Управление контентом (`Vovkin06@gmail.com` имеет полные права).
+- **Личный кабинет**: История покупок и настройки аватара.
+
+## Учетные данные для тестов
+**Email**: `Vovkin06@gmail.com`
+**Пароль**: `password` (любой, так как безопасность в демо-режиме упрощена)
+
+---
+*Создано с помощью Google AI Studio Build.*

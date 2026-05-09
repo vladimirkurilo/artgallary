@@ -1,0 +1,88 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Public user profile information",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "bio": { "type": "string" },
+        "role": { "type": "string", "enum": ["artist", "collector", "curator"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["displayName", "role"]
+    },
+    "Artwork": {
+      "title": "Artwork",
+      "description": "Digital artwork metadata",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "artistId": { "type": "string" },
+        "artistName": { "type": "string" },
+        "price": { "type": "number" },
+        "royaltyRate": { "type": "number", "description": "Percentage value (e.g. 10 for 10%)" },
+        "imageUrl": { "type": "string" },
+        "exhibitionId": { "type": "string" },
+        "status": { "type": "string", "enum": ["available", "sold", "reserved"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "artistId", "price", "imageUrl"]
+    },
+    "Exhibition": {
+      "title": "Exhibition",
+      "description": "Virtual gallery exhibition",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "curatorId": { "type": "string" },
+        "coverImageUrl": { "type": "string" },
+        "startDate": { "type": "string", "format": "date-time" },
+        "endDate": { "type": "string", "format": "date-time" },
+        "isPublic": { "type": "boolean" },
+        "layoutType": { "type": "string", "enum": ["minimal", "immersive", "grid"] }
+      },
+      "required": ["title", "curatorId", "startDate"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Artwork review and rating",
+      "type": "object",
+      "properties": {
+        "artworkId": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["artworkId", "userId", "rating"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Purchase transaction record",
+      "type": "object",
+      "properties": {
+        "artworkId": { "type": "string" },
+        "buyerId": { "type": "string" },
+        "artistId": { "type": "string" },
+        "amount": { "type": "number" },
+        "royaltyAmount": { "type": "number" },
+        "stripeSessionId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["artworkId", "buyerId", "amount"]
+    }
+  },
+  "firestore": {
+    "users": { "schema": "User", "description": "Public user profiles" },
+    "users/{userId}/private/data": { "schema": { "type": "object", "properties": { "email": { "type": "string" }, "stripeCustomerId": { "type": "string" } } }, "description": "Private user information" },
+    "artworks": { "schema": "Artwork", "description": "Catalog of digital art" },
+    "exhibitions": { "schema": "Exhibition", "description": "Curated virtual exhibitions" },
+    "artworks/{artworkId}/reviews": { "schema": "Review", "description": "Reviews for a specific artwork" },
+    "transactions": { "schema": "Transaction", "description": "Global transaction history" }
+  }
+}

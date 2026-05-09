@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isVerified() { return request.auth.token.email_verified == true; }
+    function isAdmin() { return isSignedIn() && (request.auth.token.email == 'Vovkin06@gmail.com'); }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\\\-]+$'); }
+
+    // Users
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if isOwner(userId) && isVerified();
+      allow update: if (isOwner(userId) || isAdmin()) && (
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'photoURL', 'bio', 'role'])
+      );
+
+      // Private data
+      match /private/data {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // Artworks
+    match /artworks/{artworkId} {
+      allow read: if true;
+      allow create: if (isSignedIn() && isVerified() && request.resource.data.artistId == request.auth.uid) || isAdmin();
+      allow update: if (
+        (isSignedIn() && (resource.data.artistId == request.auth.uid || isAdmin()) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description', 'price', 'imageUrl', 'status', 'artistName'])) ||
+        (isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])) // For purchase flow
+      );
+      allow delete: if isAdmin() || (isSignedIn() && resource.data.artistId == request.auth.uid);
+    }
+
+    // Exhibitions
+    match /exhibitions/{exhibitionId} {
+      allow read: if true; // Or restrict to isPublic if complex
+      allow create, update: if isSignedIn() && isVerified() && request.resource.data.curatorId == request.auth.uid;
+    }
+
+    // Reviews
+    match /artworks/{artworkId}/reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isVerified() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Transactions
+    match /transactions/{transactionId} {
+      allow read: if isSignedIn() && (resource.data.buyerId == request.auth.uid || resource.data.artistId == request.auth.uid);
+      allow create: if false; // Transactions should only be created via server-side or secure function in a real app,
+                             // but for this demo we'll restrict it. In a real Stripe flow, we'd use a webhook.
+    }
+  }
+}
