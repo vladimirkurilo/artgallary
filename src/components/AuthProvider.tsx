@@ -8,6 +8,7 @@ interface AuthContextType {
   signIn: (credentials: { email: string; password: string }) => Promise<void>;
   logout: () => void;
   signOut: () => void;
+  isAdmin: (user: any) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,16 +36,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       setLoading(true);
       const data = await authService.login(credentials);
+      
+      // Validate response data
+      if (typeof data !== 'object' || !data || !data.token) {
+        console.error('Invalid auth response data:', data);
+        throw new Error('Некорректный ответ от сервера аутентификации');
+      }
+
       setUser(data);
       setProfile(data);
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Auth error", error);
-      alert("Ошибка авторизации. Проверьте запуск Backend сервера.");
+      const message = error.response?.data?.error || error.message || "Ошибка авторизации";
+      alert(`${message}. Проверьте соединение с сервером.`);
+      throw error;
     } finally {
       setLoading(false);
     }
+  };
+
+  const isAdmin = (u: any) => {
+    if (!u) return false;
+    const email = u.email || u.emailAddress; // Support different formats
+    return u.roles?.includes('ROLE_ADMIN') || 
+           email?.toLowerCase().trim() === 'vovkin06@gmail.com';
   };
 
   const logout = () => {
@@ -55,7 +72,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, loading, signIn, logout, signOut: logout }}>
+    <AuthContext.Provider value={{ user, profile, loading, signIn, logout, signOut: logout, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );

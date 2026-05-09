@@ -7,11 +7,11 @@ import { Link } from 'react-router-dom';
 import { AuthModal } from './AuthModal';
 
 export const Navbar: React.FC = () => {
-  const { user, logout: signOut } = useAuth();
+  const { user, profile, logout: signOut, isAdmin: checkAdmin } = useAuth();
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  const isAdmin = user?.roles?.includes('ROLE_ADMIN') || user?.email === 'Vovkin06@gmail.com';
+  const isAdmin = checkAdmin(user) || checkAdmin(profile);
 
   React.useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);

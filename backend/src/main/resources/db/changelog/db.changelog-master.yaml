@@ -26,12 +26,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: image_url
-                  type: varchar(255)
-              - column:
-                  name: artist_name
-                  type: varchar(255)
-              - column:
                   name: artist_id
                   type: varchar(255)
               - column:
@@ -40,3 +34,137 @@ databaseChangeLog:
               - column:
                   name: created_at
                   type: timestamp
+  - changeSet:
+      id: 6
+      author: vovkin
+      changes:
+        - addColumn:
+            tableName: artworks
+            columns:
+              - column:
+                  name: royalty_rate
+                  type: double
+              - column:
+                  name: image_url
+                  type: varchar(255)
+              - column:
+                  name: artist_name
+                  type: varchar(255)
+  - changeSet:
+      id: 2
+      author: vovkin
+      changes:
+        - createTable:
+            tableName: artists
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: bio
+                  type: text
+              - column:
+                  name: specialty
+                  type: varchar(255)
+              - column:
+                  name: avatar_url
+                  type: varchar(255)
+              - column:
+                  name: location
+                  type: varchar(255)
+              - column:
+                  name: exhibition_count
+                  type: integer
+  - changeSet:
+      id: 3
+      author: vovkin
+      changes:
+        - createTable:
+            tableName: exhibitions
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: title
+                  type: varchar(255)
+              - column:
+                  name: description
+                  type: text
+              - column:
+                  name: image_url
+                  type: varchar(255)
+              - column:
+                  name: video_url
+                  type: varchar(255)
+              - column:
+                  name: start_date
+                  type: date
+              - column:
+                  name: end_date
+                  type: date
+              - column:
+                  name: location
+                  type: varchar(255)
+              - column:
+                  name: status
+                  type: varchar(50)
+  - changeSet:
+      id: 4
+      author: vovkin
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: email
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: display_name
+                  type: varchar(255)
+              - column:
+                  name: photo_url
+                  type: varchar(255)
+  - changeSet:
+      id: 5
+      author: vovkin
+      changes:
+        - createTable:
+            tableName: user_roles
+            columns:
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_user_roles_user
+                    referencedTableName: users
+                    referencedColumnNames: id
+              - column:
+                  name: role
+                  type: varchar(50)
+                  constraints:
+                    nullable: false

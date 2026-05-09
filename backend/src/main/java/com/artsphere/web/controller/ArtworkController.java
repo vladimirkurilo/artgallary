@@ -2,8 +2,7 @@ package com.artsphere.web.controller;
 
 import com.artsphere.application.dto.ArtworkDTO;
 import com.artsphere.domain.model.Artwork;
-import com.artsphere.infrastructure.persistence.ArtworkRepository;
-import lombok.RequiredArgsConstructor;
+import com.artsphere.domain.repository.ArtworkRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,11 +12,14 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/artworks")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class ArtworkController {
 
     private final ArtworkRepository artworkRepository;
+
+    public ArtworkController(ArtworkRepository artworkRepository) {
+        this.artworkRepository = artworkRepository;
+    }
 
     @GetMapping
     public List<ArtworkDTO> getAllArtworks() {
@@ -57,7 +59,7 @@ public class ArtworkController {
                 artwork.getPrice(),
                 artwork.getImageUrl(),
                 artwork.getArtistName(),
-                artwork.getStatus().name(),
+                artwork.getStatus() != null ? artwork.getStatus().name() : "AVAILABLE",
                 artwork.getCreatedAt()
         );
     }

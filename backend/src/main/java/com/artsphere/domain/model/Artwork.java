@@ -1,17 +1,11 @@
 package com.artsphere.domain.model;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "artworks")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Artwork {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,6 +33,21 @@ public class Artwork {
 
     private LocalDateTime createdAt;
 
+    public Artwork() {}
+
+    public Artwork(Long id, String title, String description, BigDecimal price, Double royaltyRate, String imageUrl, String artistName, String artistId, ArtworkStatus status, LocalDateTime createdAt) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.price = price;
+        this.royaltyRate = royaltyRate;
+        this.imageUrl = imageUrl;
+        this.artistName = artistName;
+        this.artistId = artistId;
+        this.status = status;
+        this.createdAt = createdAt;
+    }
+
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
@@ -48,4 +57,25 @@ public class Artwork {
     public enum ArtworkStatus {
         AVAILABLE, SOLD, RESERVED
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
+    public Double getRoyaltyRate() { return royaltyRate; }
+    public void setRoyaltyRate(Double royaltyRate) { this.royaltyRate = royaltyRate; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public String getArtistName() { return artistName; }
+    public void setArtistName(String artistName) { this.artistName = artistName; }
+    public String getArtistId() { return artistId; }
+    public void setArtistId(String artistId) { this.artistId = artistId; }
+    public ArtworkStatus getStatus() { return status; }
+    public void setStatus(ArtworkStatus status) { this.status = status; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

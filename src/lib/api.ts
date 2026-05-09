@@ -16,47 +16,61 @@ api.interceptors.request.use((config) => {
 
 export const artworkService = {
   getAll: async () => {
-    const response = await api.get('/artworks');
+    const response = await api.get('artworks');
     return response.data;
   },
   getById: async (id: number) => {
-    const response = await api.get(`/artworks/${id}`);
+    const response = await api.get(`artworks/${id}`);
     return response.data;
   },
   create: async (data: any) => {
-    const response = await api.post('/artworks', data);
+    const response = await api.post('artworks', data);
     return response.data;
   },
   delete: async (id: number) => {
-    await api.delete(`/artworks/${id}`);
+    await api.delete(`artworks/${id}`);
   },
   purchase: async (id: number) => {
-    const response = await api.post(`/payments/checkout?artworkId=${id}`);
+    const response = await api.post(`payments/checkout?artworkId=${id}`);
     return response.data; // This returns the checkout URL
   }
 };
 
 export const exhibitionService = {
   getAll: async () => {
-    const response = await api.get('/exhibitions');
+    const response = await api.get('exhibitions');
     return response.data;
+  },
+  create: async (data: any) => {
+    const response = await api.post('exhibitions', data);
+    return response.data;
+  },
+  delete: async (id: number) => {
+    await api.delete(`exhibitions/${id}`);
   }
 };
 
 export const artistService = {
   getAll: async () => {
-    const response = await api.get('/artists');
+    const response = await api.get('artists');
     return response.data;
+  },
+  create: async (data: any) => {
+    const response = await api.post('artists', data);
+    return response.data;
+  },
+  delete: async (id: number) => {
+    await api.delete(`artists/${id}`);
   }
 };
 
 export const authService = {
   login: async (credentials: any) => {
-    const response = await api.post('/auth/login', credentials);
+    const response = await api.post('auth/login', credentials);
     return response.data;
   },
   register: async (data: any) => {
-    const response = await api.post('/auth/register', data);
+    const response = await api.post('auth/register', data);
     return response.data;
   }
 };

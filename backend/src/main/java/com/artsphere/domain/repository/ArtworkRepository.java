@@ -1,4 +1,4 @@
-package com.artsphere.infrastructure.persistence;
+package com.artsphere.domain.repository;
 
 import com.artsphere.domain.model.Artwork;
 import org.springframework.data.jpa.repository.JpaRepository;
