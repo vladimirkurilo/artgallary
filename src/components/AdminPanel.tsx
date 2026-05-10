@@ -15,6 +15,7 @@ export const AdminPanel: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   const { user, profile, loading: authLoading, isAdmin: checkAdmin } = useAuth();
   
   const [newArtwork, setNewArtwork] = useState({
@@ -93,7 +94,12 @@ export const AdminPanel: React.FC = () => {
 
   const handleAddArtwork = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     try {
+      if (!newArtwork.imageUrl) {
+        setError('Пожалуйста, загрузите изображение или укажите ссылку на него.');
+        return;
+      }
       if (editingItem) {
         const updated = await artworkService.update(editingItem.id, newArtwork);
         setItems(items.map(item => item.id === editingItem.id ? updated : item));
@@ -108,13 +114,15 @@ export const AdminPanel: React.FC = () => {
       setShowAddForm(false);
       setEditingItem(null);
       setNewArtwork({ title: '', artistName: '', price: 0, imageUrl: '', description: '', royaltyRate: 10 });
-    } catch (error) {
-      console.error("Error saving artwork:", error);
+    } catch (err: any) {
+      console.error("Error saving artwork:", err);
+      setError(err.response?.data?.error || 'Ошибка при сохранении работы.');
     }
   };
 
   const handleAddArtist = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     try {
       if (editingItem) {
         const updated = await artistService.update(editingItem.id, newArtist);
@@ -126,14 +134,20 @@ export const AdminPanel: React.FC = () => {
       setShowAddForm(false);
       setEditingItem(null);
       setNewArtist({ name: '', bio: '', specialty: '', avatarUrl: '', location: '', artworkCount: 0 });
-    } catch (error) {
-      console.error("Error saving artist:", error);
+    } catch (err: any) {
+      console.error("Error saving artist:", err);
+      setError(err.response?.data?.error || 'Ошибка при сохранении профиля художника.');
     }
   };
 
   const handleAddExhibition = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     try {
+      if (!newExhibition.imageUrl) {
+        setError('Пожалуйста, загрузите обложку выставки.');
+        return;
+      }
       if (editingItem) {
         const updated = await exhibitionService.update(editingItem.id, newExhibition);
         setItems(items.map(item => item.id === editingItem.id ? updated : item));
@@ -149,8 +163,9 @@ export const AdminPanel: React.FC = () => {
         endDate: new Date().toISOString().split('T')[0],
         location: '', status: 'UPCOMING'
       });
-    } catch (error) {
-      console.error("Error saving exhibition:", error);
+    } catch (err: any) {
+      console.error("Error saving exhibition:", err);
+      setError(err.response?.data?.error || 'Ошибка при сохранении выставки.');
     }
   };
 
@@ -158,32 +173,32 @@ export const AdminPanel: React.FC = () => {
     setEditingItem(item);
     if (activeTab === 'artworks') {
       setNewArtwork({
-        title: item.title,
-        artistName: item.artistName,
-        price: item.price,
-        imageUrl: item.imageUrl,
-        description: item.description,
+        title: item.title || '',
+        artistName: item.artistName || '',
+        price: item.price || 0,
+        imageUrl: item.imageUrl || '',
+        description: item.description || '',
         royaltyRate: item.royaltyRate || 10
       });
     } else if (activeTab === 'artists') {
       setNewArtist({
-        name: item.name,
-        bio: item.bio,
-        specialty: item.specialty,
-        avatarUrl: item.avatarUrl,
-        location: item.location,
+        name: item.name || '',
+        bio: item.bio || '',
+        specialty: item.specialty || '',
+        avatarUrl: item.avatarUrl || '',
+        location: item.location || '',
         artworkCount: item.artworkCount || 0
       });
     } else if (activeTab === 'exhibitions') {
       setNewExhibition({
-        title: item.title,
-        description: item.description,
-        imageUrl: item.imageUrl,
+        title: item.title || '',
+        description: item.description || '',
+        imageUrl: item.imageUrl || '',
         videoUrl: item.videoUrl || '',
-        startDate: item.startDate,
-        endDate: item.endDate,
-        location: item.location,
-        status: item.status
+        startDate: item.startDate || '',
+        endDate: item.endDate || '',
+        location: item.location || '',
+        status: item.status || 'UPCOMING'
       });
     }
     setShowAddForm(true);
@@ -317,48 +332,55 @@ export const AdminPanel: React.FC = () => {
               <h2 className="text-3xl font-serif italic mb-8">
                 {editingItem ? 'Редактирование' : (activeTab === 'artworks' ? 'Новая работа' : activeTab === 'artists' ? 'Новый художник' : 'Новая выставка')}
               </h2>
+
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-4 mb-8 text-xs font-mono flex items-center gap-3">
+                  <ShieldAlert size={16} />
+                  {error}
+                </div>
+              )}
               
               {activeTab === 'artworks' && (
                 <form onSubmit={handleAddArtwork} className="space-y-6">
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Название</label>
-                      <input required type="text" value={newArtwork.title} onChange={e => setNewArtwork({...newArtwork, title: e.target.value})}
+                      <input required type="text" value={newArtwork.title || ''} onChange={e => setNewArtwork({...newArtwork, title: e.target.value})}
                         className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Художник</label>
-                      <input required type="text" value={newArtwork.artistName} onChange={e => setNewArtwork({...newArtwork, artistName: e.target.value})}
+                      <input required type="text" value={newArtwork.artistName || ''} onChange={e => setNewArtwork({...newArtwork, artistName: e.target.value})}
                         className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Цена (USD)</label>
-                      <input required type="number" value={newArtwork.price} onChange={e => setNewArtwork({...newArtwork, price: Number(e.target.value)})}
+                      <input required type="number" value={newArtwork.price ?? 0} onChange={e => setNewArtwork({...newArtwork, price: Number(e.target.value)})}
                         className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Роялти (%)</label>
-                      <input required type="number" value={newArtwork.royaltyRate} onChange={e => setNewArtwork({...newArtwork, royaltyRate: Number(e.target.value)})}
+                      <input required type="number" value={newArtwork.royaltyRate ?? 0} onChange={e => setNewArtwork({...newArtwork, royaltyRate: Number(e.target.value)})}
                         className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Изображение работы</label>
                     <FileUploader 
-                      currentUrl={newArtwork.imageUrl} 
+                      currentUrl={newArtwork.imageUrl || ''} 
                       onUploadSuccess={(url) => setNewArtwork({...newArtwork, imageUrl: url})} 
                     />
                     <div className="mt-2 flex gap-2">
-                      <input type="url" value={newArtwork.imageUrl} onChange={e => setNewArtwork({...newArtwork, imageUrl: e.target.value})}
+                      <input type="text" value={newArtwork.imageUrl || ''} onChange={e => setNewArtwork({...newArtwork, imageUrl: e.target.value})}
                         placeholder="Или вставьте прямую ссылку"
                         className="flex-1 bg-[#111] border border-border p-3 text-[10px] focus:border-accent focus:outline-none transition-colors" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Описание</label>
-                    <textarea value={newArtwork.description} onChange={e => setNewArtwork({...newArtwork, description: e.target.value})}
+                    <textarea value={newArtwork.description || ''} onChange={e => setNewArtwork({...newArtwork, description: e.target.value})}
                       className="w-full bg-[#111] border border-border p-4 h-32 focus:border-accent focus:outline-none transition-colors"></textarea>
                   </div>
                   <button type="submit" className="w-full py-5 bg-accent text-white font-bold uppercase tracking-widest text-[10px] hover:scale-105 transition-all">
@@ -372,42 +394,42 @@ export const AdminPanel: React.FC = () => {
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Имя</label>
-                      <input required type="text" value={newArtist.name} onChange={e => setNewArtist({...newArtist, name: e.target.value})}
+                      <input required type="text" value={newArtist.name || ''} onChange={e => setNewArtist({...newArtist, name: e.target.value})}
                         className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Специализация</label>
-                      <input required type="text" value={newArtist.specialty} onChange={e => setNewArtist({...newArtist, specialty: e.target.value})}
+                      <input required type="text" value={newArtist.specialty || ''} onChange={e => setNewArtist({...newArtist, specialty: e.target.value})}
                         className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Локация</label>
-                      <input required type="text" value={newArtist.location} onChange={e => setNewArtist({...newArtist, location: e.target.value})}
+                      <input required type="text" value={newArtist.location || ''} onChange={e => setNewArtist({...newArtist, location: e.target.value})}
                         className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Кол-во работ</label>
-                      <input type="number" value={newArtist.artworkCount} onChange={e => setNewArtist({...newArtist, artworkCount: Number(e.target.value)})}
+                      <input type="number" value={newArtist.artworkCount ?? 0} onChange={e => setNewArtist({...newArtist, artworkCount: Number(e.target.value)})}
                         className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Аватар художника</label>
                     <FileUploader 
-                      currentUrl={newArtist.avatarUrl} 
+                      currentUrl={newArtist.avatarUrl || ''} 
                       onUploadSuccess={(url) => setNewArtist({...newArtist, avatarUrl: url})} 
                     />
                     <div className="mt-2 flex gap-2">
-                      <input type="url" value={newArtist.avatarUrl} onChange={e => setNewArtist({...newArtist, avatarUrl: e.target.value})}
+                      <input type="text" value={newArtist.avatarUrl || ''} onChange={e => setNewArtist({...newArtist, avatarUrl: e.target.value})}
                         placeholder="Или вставьте прямую ссылку"
                         className="flex-1 bg-[#111] border border-border p-3 text-[10px] focus:border-accent focus:outline-none transition-colors" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Биография</label>
-                    <textarea value={newArtist.bio} onChange={e => setNewArtist({...newArtist, bio: e.target.value})}
+                    <textarea value={newArtist.bio || ''} onChange={e => setNewArtist({...newArtist, bio: e.target.value})}
                       className="w-full bg-[#111] border border-border p-4 h-32 focus:border-accent focus:outline-none transition-colors"></textarea>
                   </div>
                   <button type="submit" className="w-full py-5 bg-accent text-white font-bold uppercase tracking-widest text-[10px] hover:scale-105 transition-all">
@@ -420,30 +442,30 @@ export const AdminPanel: React.FC = () => {
                 <form onSubmit={handleAddExhibition} className="space-y-6">
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Название</label>
-                    <input required type="text" value={newExhibition.title} onChange={e => setNewExhibition({...newExhibition, title: e.target.value})}
+                    <input required type="text" value={newExhibition.title || ''} onChange={e => setNewExhibition({...newExhibition, title: e.target.value})}
                       className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
                   </div>
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Дата начала</label>
-                      <input required type="date" value={newExhibition.startDate} onChange={e => setNewExhibition({...newExhibition, startDate: e.target.value})}
+                      <input required type="date" value={newExhibition.startDate || ''} onChange={e => setNewExhibition({...newExhibition, startDate: e.target.value})}
                         className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors text-white" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Дата окончания</label>
-                      <input required type="date" value={newExhibition.endDate} onChange={e => setNewExhibition({...newExhibition, endDate: e.target.value})}
+                      <input required type="date" value={newExhibition.endDate || ''} onChange={e => setNewExhibition({...newExhibition, endDate: e.target.value})}
                         className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors text-white" />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Локация</label>
-                      <input required type="text" value={newExhibition.location} onChange={e => setNewExhibition({...newExhibition, location: e.target.value})}
+                      <input required type="text" value={newExhibition.location || ''} onChange={e => setNewExhibition({...newExhibition, location: e.target.value})}
                         className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Статус</label>
-                      <select value={newExhibition.status} onChange={e => setNewExhibition({...newExhibition, status: e.target.value})}
+                      <select value={newExhibition.status || 'UPCOMING'} onChange={e => setNewExhibition({...newExhibition, status: e.target.value})}
                         className="w-full bg-[#111] border border-border p-4 focus:border-accent focus:outline-none transition-colors">
                         <option value="ACTIVE">Активна</option>
                         <option value="UPCOMING">Предстоит</option>
@@ -455,22 +477,23 @@ export const AdminPanel: React.FC = () => {
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Обложка выставки</label>
                       <FileUploader 
-                        currentUrl={newExhibition.imageUrl} 
+                        currentUrl={newExhibition.imageUrl || ''} 
                         onUploadSuccess={(url) => setNewExhibition({...newExhibition, imageUrl: url})} 
                       />
-                      <input type="url" value={newExhibition.imageUrl} onChange={e => setNewExhibition({...newExhibition, imageUrl: e.target.value})}
-                        placeholder="Ссылка на обложку"
+                      <input type="text" value={newExhibition.imageUrl || ''} onChange={e => setNewExhibition({...newExhibition, imageUrl: e.target.value})}
+                        placeholder="Ссылка на обложку (опционально, если загружен файл)"
                         className="mt-2 w-full bg-[#111] border border-border p-3 text-[10px] focus:border-accent focus:outline-none transition-colors" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">URL Видео (опционально)</label>
-                      <input type="url" value={newExhibition.videoUrl} onChange={e => setNewExhibition({...newExhibition, videoUrl: e.target.value})}
+                      <input type="text" value={newExhibition.videoUrl || ''} onChange={e => setNewExhibition({...newExhibition, videoUrl: e.target.value})}
+                        placeholder="https://youtube.com/..."
                         className="w-full bg-[#111] border border-border p-4 h-[180px] focus:border-accent focus:outline-none transition-colors" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] uppercase tracking-widest font-bold text-[#444]">Описание</label>
-                    <textarea value={newExhibition.description} onChange={e => setNewExhibition({...newExhibition, description: e.target.value})}
+                    <textarea value={newExhibition.description || ''} onChange={e => setNewExhibition({...newExhibition, description: e.target.value})}
                       className="w-full bg-[#111] border border-border p-4 h-32 focus:border-accent focus:outline-none transition-colors"></textarea>
                   </div>
                   <button type="submit" className="w-full py-5 bg-accent text-white font-bold uppercase tracking-widest text-[10px] hover:scale-105 transition-all">

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { MapPin, Palette, Award } from 'lucide-react';
 import { Artist } from '../types';
@@ -68,47 +69,48 @@ export const Artists: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
           {artists.map((artist, index) => (
-            <motion.div
-              key={artist.id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.1 }}
-              className="group relative bg-[#0D0D0D] border border-border p-10 hover:border-accent transition-all duration-500"
-            >
-              <div className="flex items-start justify-between mb-8">
-                <div className="w-20 h-20 rotate-45 border border-border bg-onyx overflow-hidden group-hover:border-accent transition-colors">
-                  <img 
-                    src={artist.avatarUrl} 
-                    alt={artist.name}
-                    className="w-full h-full object-cover -rotate-45 scale-125"
-                    referrerPolicy="no-referrer"
-                  />
+            <Link key={artist.id} to={`/artist/${artist.id}`}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: index * 0.1 }}
+                className="group relative bg-[#0D0D0D] border border-border p-10 hover:border-accent transition-all duration-500 h-full"
+              >
+                <div className="flex items-start justify-between mb-8">
+                  <div className="w-20 h-20 rotate-45 border border-border bg-onyx overflow-hidden group-hover:border-accent transition-colors">
+                    <img 
+                      src={artist.avatarUrl} 
+                      alt={artist.name}
+                      className="w-full h-full object-cover -rotate-45 scale-125"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  <div className="text-right font-mono text-[9px] text-[#444] uppercase tracking-widest">
+                    ID: ART-{artist.id}-00X
+                  </div>
                 </div>
-                <div className="text-right font-mono text-[9px] text-[#444] uppercase tracking-widest">
-                  ID: ART-{artist.id}-00X
-                </div>
-              </div>
 
-              <h2 className="text-3xl font-serif italic mb-4 tracking-tight group-hover:text-white transition-colors">{artist.name}</h2>
-              <div className="flex items-center gap-3 text-accent font-mono text-[9px] uppercase tracking-widest mb-6">
-                <Palette size={10} /> {artist.specialty}
-              </div>
-              
-              <p className="text-[#666] text-xs leading-relaxed mb-8 h-12 overflow-hidden italic">
-                {artist.bio}
-              </p>
-
-              <div className="pt-8 border-t border-border flex justify-between items-center text-[9px] uppercase font-bold tracking-widest text-[#444]">
-                <div className="flex items-center gap-2">
-                  <MapPin size={10} /> {artist.location}
+                <h2 className="text-3xl font-serif italic mb-4 tracking-tight group-hover:text-white transition-colors">{artist.name}</h2>
+                <div className="flex items-center gap-3 text-accent font-mono text-[9px] uppercase tracking-widest mb-6">
+                  <Palette size={10} /> {artist.specialty}
                 </div>
-                <div className="flex items-center gap-2">
-                  <Award size={10} /> {artist.exhibitionCount} Выставок
-                </div>
-              </div>
+                
+                <p className="text-[#666] text-xs leading-relaxed mb-8 h-12 overflow-hidden italic">
+                  {artist.bio}
+                </p>
 
-              <div className="absolute inset-0 border-2 border-accent opacity-0 group-hover:opacity-10 pointer-events-none transition-opacity" />
-            </motion.div>
+                <div className="pt-8 border-t border-border flex justify-between items-center text-[9px] uppercase font-bold tracking-widest text-[#444]">
+                  <div className="flex items-center gap-2">
+                    <MapPin size={10} /> {artist.location}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Award size={10} /> {artist.exhibitionCount} Выставок
+                  </div>
+                </div>
+
+                <div className="absolute inset-0 border-2 border-accent opacity-0 group-hover:opacity-10 pointer-events-none transition-opacity" />
+              </motion.div>
+            </Link>
           ))}
         </div>
       </div>

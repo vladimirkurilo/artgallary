@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { LogOut, User, ShoppingBag } from 'lucide-react';
+import { ShoppingBag, Heart, LogOut, User } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import { useCart } from './CartProvider';
+import { useLikes } from './LikesProvider';
 import { motion } from 'motion/react';
 import { cn } from '../lib/utils';
 import { Link } from 'react-router-dom';
@@ -11,9 +12,12 @@ import { Cart } from './Cart';
 export const Navbar: React.FC = () => {
   const { user, profile, logout: signOut, isAdmin: checkAdmin } = useAuth();
   const { items } = useCart();
+  const { likedArtworks, likedArtists, likedExhibitions } = useLikes();
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  const totalLikes = likedArtworks.length + likedArtists.length + likedExhibitions.length;
 
   const isAdmin = checkAdmin(user) || checkAdmin(profile);
 
@@ -50,6 +54,18 @@ export const Navbar: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-6 border-l border-border pl-12">
+            <Link 
+              to="/likes"
+              className="relative p-2 text-[#AAA] hover:text-white transition-colors"
+            >
+              <Heart size={20} className={totalLikes > 0 ? "fill-accent text-accent" : ""} />
+              {totalLikes > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-accent text-white text-[8px] flex items-center justify-center rounded-full font-bold">
+                  {totalLikes}
+                </span>
+              )}
+            </Link>
+
             <button 
               onClick={() => setIsCartOpen(true)}
               className="relative p-2 text-[#AAA] hover:text-white transition-colors"

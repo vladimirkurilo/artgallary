@@ -26,6 +26,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // In-memory database for demo
+let reviews: any[] = [
+  { id: 1, exhibitionId: 1, userId: 'user@example.com', userName: 'Алексей', comment: 'Потрясающая выставка! Ощущение полного погружения.', rating: 5, createdAt: new Date().toISOString() },
+  { id: 2, exhibitionId: 1, userId: 'demo@example.com', userName: 'Мария', comment: 'Интересные работы, но хотелось бы больше интерактива.', rating: 4, createdAt: new Date().toISOString() }
+];
+
 let artworks = [
   {
     id: 1,
@@ -35,7 +40,10 @@ let artworks = [
     imageUrl: "https://images.unsplash.com/photo-1541963463532-d68292c34b19",
     artistName: "Elena Rossi",
     artistId: 1,
+    exhibitionId: 1,
     status: "AVAILABLE",
+    views: 245,
+    salesCount: 0,
     createdAt: new Date().toISOString()
   },
   {
@@ -46,7 +54,10 @@ let artworks = [
     imageUrl: "https://images.unsplash.com/photo-1514933651103-005eec06c04b",
     artistName: "Marcus Thorne",
     artistId: 2,
+    exhibitionId: 1,
     status: "AVAILABLE",
+    views: 189,
+    salesCount: 1,
     createdAt: new Date().toISOString()
   }
 ];
@@ -103,10 +114,10 @@ async function startServer() {
 
   // Upload endpoint
   app.post('/api/upload', upload.single('file'), (req, res) => {
-    if (!req.file) {
+    if (!(req as any).file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
-    const fileUrl = `/uploads/${req.file.filename}`;
+    const fileUrl = `/uploads/${(req as any).file.filename}`;
     res.json({ url: fileUrl });
   });
 
@@ -124,7 +135,8 @@ async function startServer() {
       token: `mock_jwt_token_${userEmail}`,
       email: userEmail,
       displayName: isAdmin ? "Administrator" : (artist ? artist.name : "Art Collector"),
-      roles: roles
+      roles: roles,
+      artistId: artist ? artist.id : null
     });
   });
 
@@ -183,10 +195,13 @@ async function startServer() {
   });
 
   app.get('/api/artists/:id', (req, res) => {
-    const artist = artists.find(a => a.id === parseInt(req.params.id));
+    const id = parseInt(req.params.id);
+    const artist = artists.find(a => a.id === id);
     if (artist) {
       const artistArtworks = artworks.filter(a => a.artistId === artist.id || a.artistName === artist.name);
-      res.json({ ...artist, artworks: artistArtworks });
+      const exhibitionIds = [...new Set(artistArtworks.map(a => a.exhibitionId).filter(eid => eid != null))];
+      const artistExhibitions = exhibitions.filter(e => exhibitionIds.includes(e.id as number));
+      res.json({ ...artist, artworks: artistArtworks, exhibitions: artistExhibitions });
     } else res.status(404).json({ error: "Artist not found" });
   });
 
@@ -218,9 +233,49 @@ async function startServer() {
   });
 
   app.get('/api/exhibitions/:id', (req, res) => {
-    const exhibition = exhibitions.find(e => e.id === parseInt(req.params.id));
-    if (exhibition) res.json(exhibition);
-    else res.status(404).json({ error: "Exhibition not found" });
+    const id = parseInt(req.params.id);
+    const exhibition = exhibitions.find(e => e.id === id);
+    if (exhibition) {
+      const exhibitionArtworks = artworks.filter(a => a.exhibitionId === id);
+      const exhibitionArtistIds = [...new Set(exhibitionArtworks.map(a => a.artistId))];
+      const exhibitionArtists = artists.filter(a => exhibitionArtistIds.includes(a.id));
+      const exhibitionReviews = reviews.filter(r => r.exhibitionId === id);
+      
+      res.json({ 
+        ...exhibition, 
+        artworks: exhibitionArtworks, 
+        artists: exhibitionArtists,
+        reviews: exhibitionReviews
+      });
+    } else res.status(404).json({ error: "Exhibition not found" });
+  });
+
+  app.post('/api/exhibitions/:id/reviews', (req, res) => {
+    const exhibitionId = parseInt(req.params.id);
+    const newReview = {
+      ...req.body,
+      id: Date.now(),
+      exhibitionId,
+      createdAt: new Date().toISOString()
+    };
+    reviews.push(newReview);
+    res.json(newReview);
+  });
+
+  app.get('/api/artist-stats/:id', (req, res) => {
+    const artistId = parseInt(req.params.id);
+    const artistArtworks = artworks.filter(a => a.artistId === artistId);
+    
+    const totalViews = artistArtworks.reduce((sum, a) => sum + (a.views || 0), 0);
+    const totalSalesValue = artistArtworks.filter(a => a.status === 'SOLD').reduce((sum, a) => sum + (a.price || 0), 0);
+    const salesCount = artistArtworks.reduce((sum, a) => sum + (a.salesCount || 0), 0);
+    
+    res.json({
+      totalViews,
+      totalSalesValue,
+      salesCount,
+      artworkStats: artistArtworks.map(a => ({ id: a.id, title: a.title, views: a.views, salesCount: a.salesCount }))
+    });
   });
 
   app.post('/api/exhibitions', (req, res) => {
@@ -247,8 +302,17 @@ async function startServer() {
 
   // Payments
   app.post('/api/payments/checkout', (req, res) => {
-    const { artworkId } = req.query;
-    res.json(`/success?artworkId=${artworkId}`);
+    const { artworkIds } = req.body;
+    
+    // Simulations: Increase sales count
+    if (Array.isArray(artworkIds)) {
+      artworkIds.forEach(id => {
+        const art = artworks.find(a => a.id === Number(id));
+        if (art) art.salesCount = (art.salesCount || 0) + 1;
+      });
+    }
+
+    res.json({ checkoutUrl: '/success' });
   });
 
   // Vite Middleware

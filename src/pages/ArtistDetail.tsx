@@ -2,14 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { artistService } from '../lib/api';
 import { Artist, Artwork } from '../types';
-import { MapPin, Palette, Award, Loader2, ArrowLeft } from 'lucide-react';
+import { MapPin, Palette, Award, Loader2, ArrowLeft, ArrowRight, Heart } from 'lucide-react';
 import { motion } from 'motion/react';
 import { ArtCard } from '../components/ArtCard';
+import { useLikes } from '../components/LikesProvider';
 
 export const ArtistDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [artist, setArtist] = useState<(Artist & { artworks: Artwork[] }) | null>(null);
+  const [artist, setArtist] = useState<Artist | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toggleLikeArtist, isLikedArtist } = useLikes();
+
+  const liked = isLikedArtist(String(id));
 
   useEffect(() => {
     const fetchArtist = async () => {
@@ -83,32 +87,56 @@ export const ArtistDetail: React.FC = () => {
 
           {/* Right: Bio & Works */}
           <div className="lg:col-span-7 space-y-16">
-            <div>
-              <span className="text-accent font-mono text-[10px] uppercase tracking-[0.5em] mb-4 block">Досье художника</span>
-              <h1 className="text-7xl md:text-8xl font-serif italic mb-8 tracking-tighter leading-none">{artist.name}</h1>
-              <div className="text-xl text-[#888] font-light leading-relaxed max-w-2xl italic">
-                {artist.bio}
+            <div className="flex items-start justify-between">
+              <div>
+                <span className="text-accent font-mono text-[10px] uppercase tracking-[0.5em] mb-4 block">Досье художника</span>
+                <h1 className="text-7xl md:text-8xl font-serif italic mb-8 tracking-tighter leading-none">{artist.name}</h1>
               </div>
+              <button 
+                onClick={() => toggleLikeArtist(String(artist.id))}
+                className={`p-6 border border-border group transition-all ${liked ? 'bg-[#1a1a1a] border-accent text-accent' : 'hover:border-accent hover:bg-[#1a1a1a]'}`}
+              >
+                <Heart size={24} className={liked ? 'fill-accent' : ''} />
+              </button>
             </div>
 
             <div className="pt-16 border-t border-border/50">
               <h2 className="text-3xl font-serif italic mb-12">Избранные работы</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                {artist.artworks?.map((artwork, index) => (
+                {artist.artworks?.map((artwork, idx) => (
                   <motion.div
                     key={artwork.id}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{ delay: idx * 0.1 }}
                   >
-                    <ArtCard 
-                      artwork={artwork} 
-                      onDetail={() => window.location.href = `/artwork/${artwork.id}`} 
-                    />
+                    <Link to={`/artwork/${artwork.id}`}>
+                      <ArtCard 
+                        artwork={artwork} 
+                        index={idx}
+                      />
+                    </Link>
                   </motion.div>
                 ))}
               </div>
             </div>
+
+            {artist.exhibitions && artist.exhibitions.length > 0 && (
+              <div className="pt-16 border-t border-border/50">
+                <h2 className="text-3xl font-serif italic mb-12">Участие в выставках</h2>
+                <div className="space-y-6">
+                  {artist.exhibitions.map((exh) => (
+                    <Link key={exh.id} to={`/exhibition/${exh.id}`} className="group flex items-center justify-between p-8 bg-[#0D0D0D] border border-border hover:border-accent transition-all">
+                      <div>
+                        <h4 className="text-xl font-serif italic group-hover:text-accent transition-colors">{exh.title}</h4>
+                        <p className="text-[10px] uppercase tracking-widest text-[#444] mt-2">{exh.startDate} — {exh.endDate}</p>
+                      </div>
+                      <ArrowRight size={20} className="text-[#333] group-hover:text-accent transition-colors" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

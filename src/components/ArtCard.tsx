@@ -3,6 +3,8 @@ import { motion } from 'motion/react';
 import { Eye, Heart, Share2 } from 'lucide-react';
 import { Artwork } from '../types';
 import { formatCurrency } from '../lib/utils';
+import { useNavigate } from 'react-router-dom';
+import { useLikes } from './LikesProvider';
 
 interface ArtCardProps {
   artwork: Artwork;
@@ -10,6 +12,16 @@ interface ArtCardProps {
 }
 
 export const ArtCard: React.FC<ArtCardProps> = ({ artwork, index }) => {
+  const navigate = useNavigate();
+  const { toggleLikeArtwork, isLikedArtwork } = useLikes();
+  const liked = isLikedArtwork(String(artwork.id));
+
+  const handleArtistClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(`/artist/${artwork.artistId}`);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -42,15 +54,32 @@ export const ArtCard: React.FC<ArtCardProps> = ({ artwork, index }) => {
       <div className="p-6">
         <div className="mb-4">
           <h3 className="text-2xl font-serif mb-1 leading-tight">{artwork.title}</h3>
-          <p className="text-[10px] uppercase tracking-widest text-[#666] font-medium leading-none">От {artwork.artistName}</p>
+          <button 
+            onClick={handleArtistClick}
+            className="text-[10px] uppercase tracking-widest text-[#666] hover:text-accent transition-colors font-medium leading-none focus:outline-none"
+          >
+            От {artwork.artistName}
+          </button>
         </div>
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <div className="text-[9px] uppercase tracking-tighter text-[#444] italic">
-            {artwork.royaltyRate}% вторичного роялти
+            Nexus-верифицирован // {artwork.views || 0} просмотров
           </div>
           <div className="flex gap-3">
-             <button onClick={(e) => e.stopPropagation()} className="p-2 text-[#444] hover:text-accent transition-colors"><Heart size={14} /></button>
-             <button onClick={(e) => e.stopPropagation()} className="p-2 text-[#444] hover:text-accent transition-colors"><Share2 size={14} /></button>
+             <button 
+               onClick={(e) => {
+                 e.preventDefault();
+                 e.stopPropagation();
+                 toggleLikeArtwork(String(artwork.id));
+               }} 
+               className={`p-2 transition-colors ${liked ? "text-accent" : "text-[#444] hover:text-accent"}`}
+             >
+               <Heart size={14} className={liked ? "fill-accent" : ""} />
+             </button>
+             <button onClick={(e) => {
+               e.preventDefault();
+               e.stopPropagation();
+             }} className="p-2 text-[#444] hover:text-accent transition-colors"><Share2 size={14} /></button>
           </div>
         </div>
       </div>

@@ -34,9 +34,9 @@ export const artworkService = {
     const response = await api.put(`artworks/${id}`, data);
     return response.data;
   },
-  purchase: async (id: number) => {
-    const response = await api.post(`payments/checkout?artworkId=${id}`);
-    return response.data; // This returns the checkout URL
+  purchase: async (ids: number[]) => {
+    const response = await api.post('payments/checkout', { artworkIds: ids });
+    return response.data.checkoutUrl; 
   }
 };
 

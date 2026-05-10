@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { Calendar, MapPin, ArrowRight } from 'lucide-react';
 import { Exhibition } from '../types';
 import { exhibitionService } from '../lib/api';
+import { Link } from 'react-router-dom';
 
 export const Exhibitions: React.FC = () => {
   const [exhibitions, setExhibitions] = useState<Exhibition[]>([]);
@@ -62,52 +63,53 @@ export const Exhibitions: React.FC = () => {
 
         <div className="grid grid-cols-1 gap-12">
           {exhibitions.map((exhibition, index) => (
-            <motion.div
-              key={exhibition.id}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="group flex flex-col md:flex-row border border-border overflow-hidden bg-[#0a0a0a]"
-            >
-              <div className="md:w-1/2 aspect-video overflow-hidden relative">
-                {exhibition.videoUrl ? (
-                  <video 
-                    src={exhibition.videoUrl}
-                    className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-1000"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
+            <Link key={exhibition.id} to={`/exhibition/${exhibition.id}`}>
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="group flex flex-col md:flex-row border border-border overflow-hidden bg-[#0a0a0a] hover:border-accent transition-all duration-500"
+              >
+                <div className="md:w-1/2 aspect-video overflow-hidden relative">
+                  {exhibition.videoUrl ? (
+                    <video 
+                      src={exhibition.videoUrl}
+                      className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-1000"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                    />
+                  ) : null}
+                  <img 
+                    src={exhibition.imageUrl} 
+                    alt={exhibition.title}
+                    className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+                    referrerPolicy="no-referrer"
                   />
-                ) : null}
-                <img 
-                  src={exhibition.imageUrl} 
-                  alt={exhibition.title}
-                  className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
-                  referrerPolicy="no-referrer"
-                />
-              </div>
-              <div className="md:w-1/2 p-12 flex flex-col justify-center">
-                <div className="flex items-center gap-4 mb-6">
-                  <span className={`text-[9px] font-bold uppercase tracking-widest px-3 py-1 border ${
-                    exhibition.status === 'ACTIVE' ? 'border-accent text-accent' : 'border-[#444] text-[#444]'
-                  }`}>
-                    {exhibition.status === 'ACTIVE' ? 'В эфире' : 'Скоро'}
-                  </span>
-                  <div className="flex items-center gap-2 text-[10px] font-mono text-[#666]">
-                    <Calendar size={12} /> {exhibition.startDate} — {exhibition.endDate}
+                </div>
+                <div className="md:w-1/2 p-12 flex flex-col justify-center">
+                  <div className="flex items-center gap-4 mb-6">
+                    <span className={`text-[9px] font-bold uppercase tracking-widest px-3 py-1 border ${
+                      exhibition.status === 'ACTIVE' ? 'border-accent text-accent' : 'border-[#444] text-[#444]'
+                    }`}>
+                      {exhibition.status === 'ACTIVE' ? 'В эфире' : 'Скоро'}
+                    </span>
+                    <div className="flex items-center gap-2 text-[10px] font-mono text-[#666]">
+                      <Calendar size={12} /> {exhibition.startDate} — {exhibition.endDate}
+                    </div>
+                  </div>
+                  <h2 className="text-4xl font-serif italic mb-6 tracking-tight group-hover:text-accent transition-colors">{exhibition.title}</h2>
+                  <p className="text-sm text-[#888] mb-8 leading-relaxed max-w-md">{exhibition.description}</p>
+                  <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-[#444] mb-10">
+                    <MapPin size={12} className="text-accent" /> {exhibition.location}
+                  </div>
+                  <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] group-hover:gap-6 transition-all">
+                    Смотреть детали <ArrowRight size={14} className="text-accent" />
                   </div>
                 </div>
-                <h2 className="text-4xl font-serif italic mb-6 tracking-tight group-hover:text-accent transition-colors">{exhibition.title}</h2>
-                <p className="text-sm text-[#888] mb-8 leading-relaxed max-w-md">{exhibition.description}</p>
-                <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-widest text-[#444] mb-10">
-                  <MapPin size={12} className="text-accent" /> {exhibition.location}
-                </div>
-                <button className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.3em] group-hover:gap-6 transition-all">
-                  Смотреть детали <ArrowRight size={14} className="text-accent" />
-                </button>
-              </div>
-            </motion.div>
+              </motion.div>
+            </Link>
           ))}
         </div>
       </div>

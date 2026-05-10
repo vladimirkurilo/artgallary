@@ -7,17 +7,29 @@ export interface UserProfile {
   createdAt: string;
 }
 
+export interface Review {
+  id: number;
+  exhibitionId?: number;
+  artworkId?: string | number;
+  userId: string;
+  userName: string;
+  comment: string;
+  rating: number;
+  createdAt: string;
+}
+
 export interface Artwork {
   id: string | number;
   title: string;
   description: string;
-  artistId: string;
+  artistId: string | number;
   artistName: string;
   price: number;
-  royaltyRate: number;
   imageUrl: string;
-  exhibitionId?: string;
-  status: 'available' | 'sold' | 'reserved';
+  exhibitionId?: string | number;
+  status: 'AVAILABLE' | 'SOLD' | 'RESERVED';
+  views?: number;
+  salesCount?: number;
   createdAt: string;
 }
 
@@ -31,6 +43,9 @@ export interface Exhibition {
   endDate: string;
   location: string;
   status: 'UPCOMING' | 'ACTIVE' | 'FINISHED';
+  artworks?: Artwork[];
+  artists?: Artist[];
+  reviews?: Review[];
 }
 
 export interface Artist {
@@ -41,25 +56,15 @@ export interface Artist {
   avatarUrl: string;
   location: string;
   exhibitionCount: number;
-}
-
-export interface Review {
-  id: string;
-  artworkId: string;
-  userId: string;
-  userName: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
+  artworks?: Artwork[];
+  exhibitions?: Exhibition[];
 }
 
 export interface Transaction {
-  id: string;
-  artworkId: string;
+  id: string | number;
+  artworkId: string | number;
   buyerId: string;
-  artistId: string;
+  artistId: string | number;
   amount: number;
-  royaltyAmount: number;
-  stripeSessionId: string;
   createdAt: string;
 }

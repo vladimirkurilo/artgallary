@@ -5,6 +5,9 @@ import { Artwork } from '../types';
 import { formatCurrency } from '../lib/utils';
 import { artworkService } from '../lib/api';
 import { useAuth } from './AuthProvider';
+import { useCart } from './CartProvider';
+import { useLikes } from './LikesProvider';
+import { Link } from 'react-router-dom';
 
 interface ArtworkDetailProps {
   artwork: Artwork | null;
@@ -13,28 +16,18 @@ interface ArtworkDetailProps {
 
 export const ArtworkDetail: React.FC<ArtworkDetailProps> = ({ artwork, onClose }) => {
   const { user, signIn } = useAuth();
+  const { addItem, items } = useCart();
+  const { toggleLikeArtwork, isLikedArtwork } = useLikes();
   const [purchasing, setPurchasing] = useState(false);
 
   if (!artwork) return null;
 
-  const handlePurchase = async () => {
-    if (!user) {
-      if (window.confirm("Для покупки необходимо авторизоваться под тестовым аккаунтом?")) {
-        signIn({ email: 'Vovkin06@gmail.com', password: 'password' });
-      }
-      return;
-    }
+  const isInCart = items.some(i => i.id === artwork.id);
+  const liked = isLikedArtwork(String(artwork.id));
 
-    try {
-      setPurchasing(true);
-      const checkoutUrl = await artworkService.purchase(Number(artwork.id));
-      window.location.href = checkoutUrl;
-    } catch (error) {
-      console.error("Purchase error:", error);
-      alert("Ошибка при инициации транзакции. Убедитесь, что Backend запущен.");
-    } finally {
-      setPurchasing(false);
-    }
+  const handleAddToCart = () => {
+    addItem(artwork);
+    onClose();
   };
 
   return (
@@ -79,7 +72,7 @@ export const ArtworkDetail: React.FC<ArtworkDetailProps> = ({ artwork, onClose }
               <span className="text-accent font-mono text-[10px] uppercase tracking-[0.4em] mb-4 block">Протокол Aetheria v4.0</span>
               <h2 className="text-5xl md:text-6xl font-serif italic mb-4 tracking-tighter leading-[0.9]">{artwork.title}</h2>
               <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-[#666]">
-                <span>Автор: {artwork.artistName}</span>
+                <Link to={`/artist/${artwork.artistId}`} className="hover:text-accent transition-colors" onClick={onClose}>Автор: {artwork.artistName}</Link>
                 <div className="w-1 h-1 rounded-full bg-accent" />
                 <span>Верифицированный актив</span>
               </div>
@@ -100,21 +93,18 @@ export const ArtworkDetail: React.FC<ArtworkDetailProps> = ({ artwork, onClose }
 
             <div className="flex gap-4">
               <button 
-                onClick={handlePurchase}
-                disabled={purchasing}
+                onClick={handleAddToCart}
+                disabled={isInCart}
                 className="flex-1 py-5 bg-accent text-white font-bold uppercase tracking-widest text-xs hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {purchasing ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                    Инициация...
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart size={16} />
-                    Приобрести работу
-                  </>
-                )}
+                <ShoppingCart size={16} />
+                {isInCart ? 'Уже в корзине' : 'Добавить в корзину'}
+              </button>
+              <button 
+                onClick={() => toggleLikeArtwork(String(artwork.id))}
+                className={`p-5 border border-border flex items-center justify-center transition-all ${liked ? "bg-[#1a1a1a] text-accent border-accent" : "hover:bg-[#1a1a1a]"}`}
+              >
+                <Heart size={20} className={liked ? "fill-accent" : ""} />
               </button>
             </div>
             
